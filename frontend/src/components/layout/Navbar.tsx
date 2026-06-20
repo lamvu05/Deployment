@@ -34,6 +34,7 @@ const Navbar: React.FC = () => {
         <div className="hidden sm:flex items-center gap-1">
           {navLink('/services', 'Dịch vụ')}
           {isAuthenticated && navLink('/my-bookings', 'Lịch của tôi')}
+          {isAuthenticated && navLink('/profile', 'Hồ sơ')}
           {user?.role === 'admin' && navLink('/admin', '⚙ Admin')}
         </div>
       </div>
@@ -41,7 +42,7 @@ const Navbar: React.FC = () => {
       <div className="flex items-center gap-3">
         {isAuthenticated ? (
           <>
-            <div className="flex items-center gap-2">
+            <Link to="/profile" className="flex items-center gap-2 cursor-pointer hover:opacity-85 transition-all no-underline">
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-500 to-purple-400 flex items-center justify-center text-white font-bold text-sm">
                 {user?.name?.charAt(0).toUpperCase()}
               </div>
@@ -51,7 +52,7 @@ const Navbar: React.FC = () => {
                   Admin
                 </span>
               )}
-            </div>
+            </Link>
             <button
               id="btn-logout"
               onClick={handleLogout}

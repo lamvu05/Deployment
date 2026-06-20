@@ -6,7 +6,7 @@ import type { LoginPayload, RegisterPayload } from '../types';
  * Custom hook for auth actions with loading and error state
  */
 export const useAuth = () => {
-  const { login, register, googleLogin, logout, user, isAuthenticated, isLoading } = useAuthContext();
+  const { login, register, googleLogin, updateProfileState, logout, user, isAuthenticated, isLoading } = useAuthContext();
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -73,6 +73,7 @@ export const useAuth = () => {
     login: handleLogin,
     register: handleRegister,
     googleLogin: handleGoogleLogin,
+    updateProfileState,
     logout,
   };
 };

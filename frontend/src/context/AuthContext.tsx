@@ -7,6 +7,7 @@ type AuthAction =
   | { type: 'AUTH_START' }
   | { type: 'AUTH_SUCCESS'; payload: { user: User; token: string } }
   | { type: 'AUTH_FAILURE' }
+  | { type: 'UPDATE_USER'; payload: User }
   | { type: 'LOGOUT' };
 
 const initialState: AuthState = {
@@ -30,6 +31,11 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
       };
     case 'AUTH_FAILURE':
       return { ...state, isLoading: false };
+    case 'UPDATE_USER':
+      return {
+        ...state,
+        user: action.payload,
+      };
     case 'LOGOUT':
       return { user: null, token: null, isAuthenticated: false, isLoading: false };
     default:
@@ -42,6 +48,7 @@ interface AuthContextValue extends AuthState {
   login: (payload: LoginPayload) => Promise<void>;
   register: (payload: RegisterPayload) => Promise<void>;
   googleLogin: (idToken: string) => Promise<void>;
+  updateProfileState: (user: User) => void;
   logout: () => void;
 }
 
@@ -89,13 +96,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     dispatch({ type: 'AUTH_SUCCESS', payload: { user, token } });
   };
 
+  const updateProfileState = (updatedUser: User) => {
+    dispatch({ type: 'UPDATE_USER', payload: updatedUser });
+  };
+
   const logout = () => {
     authService.logout();
     dispatch({ type: 'LOGOUT' });
   };
 
   return (
-    <AuthContext.Provider value={{ ...state, login, register, googleLogin, logout }}>
+    <AuthContext.Provider value={{ ...state, login, register, googleLogin, updateProfileState, logout }}>
       {children}
     </AuthContext.Provider>
   );

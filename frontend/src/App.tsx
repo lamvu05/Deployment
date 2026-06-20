@@ -9,6 +9,7 @@ import RegisterPage from './pages/RegisterPage';
 import ServicesPage from './pages/ServicesPage';
 import BookingPage from './pages/BookingPage';
 import MyBookingsPage from './pages/MyBookingsPage';
+import ProfilePage from './pages/ProfilePage';
 import AdminPage from './pages/AdminPage';
 
 const App: React.FC = () => {
@@ -28,6 +29,7 @@ const App: React.FC = () => {
               <Route path="/"            element={<HomePage />} />
               <Route path="/book/:serviceId" element={<BookingPage />} />
               <Route path="/my-bookings" element={<MyBookingsPage />} />
+              <Route path="/profile"     element={<ProfilePage />} />
             </Route>
 
             {/* Protected — admin only */}
