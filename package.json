@@ -1,0 +1,19 @@
+{
+  "name": "fullstack-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "predev": "powershell -Command \"@(5000,5173) | ForEach-Object { $p = (Get-NetTCPConnection -LocalPort $_ -EA SilentlyContinue) | Where-Object { $_.OwningProcess -gt 0 } | Select-Object -ExpandProperty OwningProcess -Unique; if ($p) { taskkill /PID $p /F | Out-Null; Write-Host \\\"Killed port $_\\\" } }\"",
+    "dev": "concurrently --names \"BE,FE\" --prefix-colors \"cyan,magenta\" \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
+    "install:all": "npm install --prefix backend && npm install --prefix frontend",
+    "db:up": "docker-compose up -d",
+    "db:down": "docker-compose down",
+    "db:reset": "docker-compose down -v && docker-compose up -d",
+    "db:migrate": "npm run db:migrate --prefix backend",
+    "db:rollback": "npm run db:rollback --prefix backend"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "kill-port": "^2.0.1"
+  }
+}
