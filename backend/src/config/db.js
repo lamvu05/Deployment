@@ -1,15 +1,24 @@
 const { Pool } = require('pg');
 
-const pool = new Pool({
-  host: process.env.DB_HOST || 'localhost',
-  port: Number(process.env.DB_PORT) || 5432,
-  user: process.env.DB_USER || 'appuser',
-  password: process.env.DB_PASSWORD || 'apppassword',
-  database: process.env.DB_NAME || 'appdb',
-  max: 20,                 // Max connections in pool
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
-});
+const pool = new Pool(
+  process.env.DATABASE_URL
+    ? {
+        connectionString: process.env.DATABASE_URL,
+        ssl: {
+          rejectUnauthorized: false,
+        },
+      }
+    : {
+        host: process.env.DB_HOST || 'localhost',
+        port: Number(process.env.DB_PORT) || 5432,
+        user: process.env.DB_USER || 'appuser',
+        password: process.env.DB_PASSWORD || 'apppassword',
+        database: process.env.DB_NAME || 'appdb',
+        max: 20,                 // Max connections in pool
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 2000,
+      }
+);
 
 pool.on('connect', () => {
   if (process.env.NODE_ENV === 'development') {
