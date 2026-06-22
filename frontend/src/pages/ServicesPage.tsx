@@ -1,21 +1,64 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { serviceApi } from '../services/serviceApi';
+import { favouriteApi } from '../services/favouriteApi';
+import { useAuth } from '../hooks/useAuth';
 import type { Service } from '../types';
 
 const formatPrice = (p: number) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p);
 
 const ServicesPage: React.FC = () => {
+  const { isAuthenticated } = useAuth();
   const [services, setServices] = useState<Service[]>([]);
+  const [favIds, setFavIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    serviceApi.getAll()
-      .then(setServices)
-      .catch(() => setError('Không thể tải danh sách dịch vụ'))
-      .finally(() => setLoading(false));
-  }, []);
+    const loadData = async () => {
+      try {
+        const servicesData = await serviceApi.getAll();
+        setServices(servicesData);
+
+        if (isAuthenticated) {
+          const favs = await favouriteApi.getMyFavourites();
+          setFavIds(new Set(favs.map((f) => f.id)));
+        }
+      } catch (err) {
+        setError('Không thể tải danh sách dịch vụ');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, [isAuthenticated]);
+
+  const toggleFavourite = async (e: React.MouseEvent, serviceId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const isFav = favIds.has(serviceId);
+    try {
+      if (isFav) {
+        await favouriteApi.remove(serviceId);
+        setFavIds((prev) => {
+          const next = new Set(prev);
+          next.delete(serviceId);
+          return next;
+        });
+      } else {
+        await favouriteApi.add(serviceId);
+        setFavIds((prev) => {
+          const next = new Set(prev);
+          next.add(serviceId);
+          return next;
+        });
+      }
+    } catch (err) {
+      console.error('Không thể cập nhật yêu thích', err);
+    }
+  };
 
   if (loading) return (
     <div className="flex items-center justify-center min-h-[60vh] gap-3 text-slate-400">
@@ -45,9 +88,24 @@ const ServicesPage: React.FC = () => {
               <div className="w-12 h-12 rounded-xl bg-brand-500/15 flex items-center justify-center text-2xl">
                 🏢
               </div>
-              <span className="text-xs font-semibold text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-2 py-1 rounded-full">
-                Còn chỗ
-              </span>
+              <div className="flex items-center gap-2">
+                {isAuthenticated && (
+                  <button
+                    onClick={(e) => toggleFavourite(e, s.id)}
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center border transition-all cursor-pointer ${
+                      favIds.has(s.id)
+                        ? 'bg-red-500/15 border-red-500/30 text-red-500 hover:bg-red-500/25'
+                        : 'bg-white/[0.03] border-white/[0.08] text-slate-400 hover:text-white hover:bg-white/[0.08]'
+                    }`}
+                    title={favIds.has(s.id) ? 'Xóa khỏi yêu thích' : 'Thêm vào yêu thích'}
+                  >
+                    {favIds.has(s.id) ? '❤️' : '🤍'}
+                  </button>
+                )}
+                <span className="text-xs font-semibold text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-2 py-1 rounded-full">
+                  Còn chỗ
+                </span>
+              </div>
             </div>
 
             <h2 className="text-lg font-semibold text-white mb-1 group-hover:text-brand-400 transition-colors">
