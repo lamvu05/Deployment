@@ -34,6 +34,7 @@ const Navbar: React.FC = () => {
         <div className="hidden sm:flex items-center gap-1">
           {navLink('/services', 'Dịch vụ')}
           {isAuthenticated && navLink('/my-bookings', 'Lịch của tôi')}
+          {isAuthenticated && navLink('/favourites', 'Yêu thích')}
           {isAuthenticated && navLink('/profile', 'Hồ sơ')}
           {user?.role === 'admin' && navLink('/admin', '⚙ Admin')}
         </div>

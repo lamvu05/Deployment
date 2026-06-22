@@ -9,6 +9,7 @@ const userRoutes    = require('./routes/userRoutes');
 const serviceRoutes = require('./routes/serviceRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
+const favouriteRoutes = require('./routes/favouriteRoutes');
 
 const app = express();
 
@@ -40,11 +41,12 @@ app.get('/api/health', (_req, res) => {
 });
 
 // ── API Routes ──────────────────────────────────────────────────
-app.use('/api/auth',     authRoutes);
-app.use('/api/users',    userRoutes);
-app.use('/api/services', serviceRoutes);
-app.use('/api/bookings', bookingRoutes);
-app.use('/api/reviews',  reviewRoutes);
+app.use('/api/auth',       authRoutes);
+app.use('/api/users',      userRoutes);
+app.use('/api/services',   serviceRoutes);
+app.use('/api/bookings',   bookingRoutes);
+app.use('/api/reviews',    reviewRoutes);
+app.use('/api/favourites', favouriteRoutes);
 
 // ── Error Handling ──────────────────────────────────────────────
 app.use(notFound);

@@ -11,6 +11,7 @@ import BookingPage from './pages/BookingPage';
 import MyBookingsPage from './pages/MyBookingsPage';
 import ProfilePage from './pages/ProfilePage';
 import AdminPage from './pages/AdminPage';
+import FavouritesPage from './pages/FavouritesPage';
 
 const App: React.FC = () => {
   return (
@@ -29,6 +30,7 @@ const App: React.FC = () => {
               <Route path="/"            element={<HomePage />} />
               <Route path="/book/:serviceId" element={<BookingPage />} />
               <Route path="/my-bookings" element={<MyBookingsPage />} />
+              <Route path="/favourites"  element={<FavouritesPage />} />
               <Route path="/profile"     element={<ProfilePage />} />
             </Route>
 
