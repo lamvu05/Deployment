@@ -1,13 +1,32 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { notificationApi } from '../../services/notificationApi';
 
 const Navbar: React.FC = () => {
   const { isAuthenticated, user, logout } = useAuth();
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const handleLogout = () => { logout(); navigate('/login'); };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      notificationApi.getUnreadCount()
+        .then(setUnreadCount)
+        .catch(() => {});
+
+      // Poll for unread count updates every 10 seconds
+      const interval = setInterval(() => {
+        notificationApi.getUnreadCount()
+          .then(setUnreadCount)
+          .catch(() => {});
+      }, 10000);
+
+      return () => clearInterval(interval);
+    }
+  }, [isAuthenticated, pathname]);
 
   const navLink = (to: string, label: string) => (
     <Link
@@ -35,6 +54,23 @@ const Navbar: React.FC = () => {
           {navLink('/services', 'Dịch vụ')}
           {isAuthenticated && navLink('/my-bookings', 'Lịch của tôi')}
           {isAuthenticated && navLink('/favourites', 'Yêu thích')}
+          {isAuthenticated && (
+            <Link
+              to="/notifications"
+              className={`text-sm font-medium transition-colors px-3 py-1.5 rounded-lg flex items-center gap-1.5 ${
+                pathname === '/notifications'
+                  ? 'text-white bg-white/[0.08]'
+                  : 'text-slate-400 hover:text-white hover:bg-white/[0.05]'
+              }`}
+            >
+              <span>Thông báo</span>
+              {unreadCount > 0 && (
+                <span className="bg-brand-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center animate-pulse">
+                  {unreadCount}
+                </span>
+              )}
+            </Link>
+          )}
           {isAuthenticated && navLink('/profile', 'Hồ sơ')}
           {user?.role === 'admin' && navLink('/admin', '⚙ Admin')}
         </div>

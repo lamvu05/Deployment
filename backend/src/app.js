@@ -10,6 +10,7 @@ const serviceRoutes = require('./routes/serviceRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 const favouriteRoutes = require('./routes/favouriteRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 
 const app = express();
 
@@ -47,6 +48,7 @@ app.use('/api/services',   serviceRoutes);
 app.use('/api/bookings',   bookingRoutes);
 app.use('/api/reviews',    reviewRoutes);
 app.use('/api/favourites', favouriteRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // ── Error Handling ──────────────────────────────────────────────
 app.use(notFound);
