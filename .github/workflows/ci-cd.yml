@@ -65,27 +65,34 @@ jobs:
 
   # ── CD JOB: DEPLOYMENT ──────────────────────────────────────────
   deploy:
-    name: Deploy to Production
+    name: Deploy to Production & Run Migrations
     needs: [backend-ci, frontend-ci]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy Step
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install Backend Dependencies
         run: |
-          echo "CI tests passed successfully!"
-          echo "Triggering deployment process..."
-          # Example deployment triggers:
-          #
-          # Option A: Trigger Render Deploy Hook
-          # curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
-          #
-          # Option B: SSH Deploy to VPS
-          # uses: appleboy/ssh-action@master
-          # with:
-          #   host: ${{ secrets.VPS_HOST }}
-          #   username: ${{ secrets.VPS_USER }}
-          #   key: ${{ secrets.VPS_SSH_KEY }}
-          #   script: |
-          #     cd /path/to/app
-          #     git pull origin main
-          #     docker-compose up -d --build
+          cd backend
+          npm ci
+
+      - name: Run Database Migrations on Supabase
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DATABASE_URL }}
+        run: |
+          cd backend
+          npm run db:migrate
+
+      - name: Trigger Render Deploy Hook
+        # Nếu bạn có cài đặt RENDER_DEPLOY_HOOK_URL trong Secrets:
+        # run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: echo "Database migrations and deployment completed!"
