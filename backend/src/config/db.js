@@ -4,9 +4,11 @@ const pool = new Pool(
   process.env.DATABASE_URL
     ? {
         connectionString: process.env.DATABASE_URL,
-        ssl: {
-          rejectUnauthorized: false,
-        },
+        ssl: (process.env.DATABASE_URL.includes('localhost') || process.env.DATABASE_URL.includes('127.0.0.1'))
+          ? false
+          : {
+              rejectUnauthorized: false,
+            },
       }
     : {
         host: process.env.DB_HOST || 'localhost',
